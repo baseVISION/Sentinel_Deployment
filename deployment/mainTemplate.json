@@ -75,7 +75,7 @@
         },
         "resourceGroupOutput": {
             "type": "string",
-            "value": "[reference(resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName')), '2015-11-01-preview').resourceGroup]"
+            "value": "[resourceGroup().name]"
         },
         "workspaceNameOutput": {
             "type": "string",
@@ -91,7 +91,11 @@
         },
         "pricingTierOutput": {
             "type": "string",
-            "value": "[reference(resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName')), '2015-11-01-preview').sku.name]"
+            "value": "[reference(resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName')), '2015-11-01-preview').sku]"
+        },
+        "workspaceCappingOutput": {
+            "type": "string",
+            "value": "[reference(resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName')), '2015-11-01-preview').dailyQuotaGb]"
         },
         "locationOutput": {
             "type": "string",
