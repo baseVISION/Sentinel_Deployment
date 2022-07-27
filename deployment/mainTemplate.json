@@ -94,12 +94,12 @@
             "value": "[reference(resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName')), '2015-11-01-preview').sku.name]"
         },
         "retentionInDaysOutput": {
-            "type": "int",
-            "value": "[parameters('retentionInDays')]"
+            "type": "string",
+            "value": "[string(parameters('retentionInDays'))]"
         },
         "workspaceCappingOutput": {
-            "type": "int",
-            "value": "[parameters('dailyQuotaInGb')]"
+            "type": "string",
+            "value": "[string(parameters('dailyQuotaInGb'))]"
         },
         "locationOutput": {
             "type": "string",
