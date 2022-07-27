@@ -3,65 +3,52 @@
     "handler": "Microsoft.Azure.CreateUIDef",
     "version": "0.1.2-preview",
     "parameters": {
-        "config": {
-            "isWizard": true,
-            "basics": {
-                "description": "**Azure Sentinel All-In-One** deployment",
-                "location": {
-                    "label": "Location",
-                    "toolTip": "Location for all resources",
-                    "resourceTypes": [
-                        "Microsoft.OperationalInsights"
-                    ]
-                }
-            }
-        },        
         "basics": [
+            {
+                "name": "sentinelName",
+                "type": "Microsoft.Common.TextBox",
+                "label": "Sentinel Name",
+                "placeholder": "",
+                "defaultValue": "sentinel01",
+                "toolTip": "Use only allowed characters",
+                "constraints": {
+                    "required": true,
+                    "regex": "^[a-z0-9A-Z]{1,30}$",
+                    "validationMessage": "Only alphanumeric characters are allowed, and the value must be 1-30 characters long."
+                },
+                "visible": true
+            }
 		],
         "steps": [
 			            {
-                "name": "workspace",
-                "label": "Workspace",
+                "name": "sentinel",
+                "label": "Sentinel",
                 "elements": [
-                    {
-                        "name": "workspaceName",
-                        "type": "Microsoft.Common.TextBox",
-                        "label": "Workspace Name",
-                        "placeholder": "",
-                        "defaultValue": "sentinel01",
-                        "toolTip": "Use only allowed characters",
-                        "constraints": {
-                            "required": true,
-                            "regex": "^[a-z0-9A-Z]{1,30}$",
-                            "validationMessage": "Only alphanumeric characters are allowed, and the value must be 1-30 characters long."
-                        },
-                        "visible": true
-                    } ,                   
 					{
 						"name": "retentionInDays",
 						"type": "Microsoft.Common.TextBox",
-						"label": "Number of days of retention",
+						"label": "Retention In Days",
 						"placeholder": "",
 						"defaultValue": "90",
 						"toolTip": "Use value between 30 and 730",
 						"constraints": {
 							"required": true,
 							"regex": "^[3-9][0-9]$|^[1-6][0-9][0-9]$|^[7][0-2][0-9]$|^730$",
-							"validationMessage": "Only numbers allowed, and must be between 30 and 730 days."
+							"validationMessage": "Only numeric characters are allowed, and the value must be between 30 and 730."
 						},
 						"visible": true
 					},
 					{
 						"name": "dailyQuotaInGb",
 						"type": "Microsoft.Common.TextBox",
-						"label": "Daily ingestion limit in GBs. Enter 0 for no limit.",
+						"label": "Daily Quota In Gb",
 						"placeholder": "",
 						"defaultValue": "1",
-						"toolTip": "This limit doesn't apply to the following tables: SecurityAlert, SecurityBaseline, SecurityBaselineSummary, SecurityDetection, SecurityEvent, WindowsFirewall, MaliciousIPCommunication, LinuxAuditLog, SysmonEvent, ProtectionStatus, WindowsEvent",
+						"toolTip": "Use value between 1 and 10",
 						"constraints": {
 							"required": true,
-							"regex": "^[0-9]{1,4}$",
-							"validationMessage": "Only numbers allowed, and the value must be 1-4 characters long."
+							"regex": "^[1-9]$|^10$",
+							"validationMessage": "Only numeric characters are allowed, and the value must be between 1 and 10."
 						},
 						"visible": true
 					}
@@ -84,10 +71,9 @@
             }
         ],
         "outputs": {
-            "location": "[location()]",
-            "workspaceName": "[steps('workspace').workspaceName]",
-            "retentionInDays": "[steps('workspace').retentionInDays]",
-            "dailyQuotaInGb": "[steps('workspace').dailyQuotaInGb]",
+            "sentinelName": "[basics('sentinelName')]",
+            "retentionInDays": "[steps('retentionInDays')]",
+            "dailyQuotaInGb": "[steps('dailyQuotaInGb')]",
             "resourceTags": "[steps('tags').tagsByResource]"
         },
 		"resourceTypes": [
