@@ -20,13 +20,16 @@
         "type": "int",
         "defaultValue": 1
       },
-      "resourceTags": {
-        "type": "object"
+      "tagsByResource": { 
+        "type": "object", 
+        "defaultValue": {} 
       }
     },
     "variables": {
       "workspaceName": "[parameters('workspaceName')]",
-      "solutionName": "[format('SecurityInsights({0})', variables('workspaceName'))]"
+      "solutionName": "[format('SecurityInsights({0})', variables('workspaceName'))]",
+      "tagsWorkspaces": "[ if(contains(parameters('tagsByResource'), 'Microsoft.OperationalInsights/workspaces'), parameters('tagsByResource')['Microsoft.OperationalInsights/workspaces'], json('{}')) ]",
+      "tagsSolutions":"[ if(contains(parameters('tagsByResource'), 'Microsoft.OperationsManagement/solutions'), parameters('tagsByResource')['Microsoft.OperationsManagement/solutions'], json('{}')) ]"
     },
     "resources": [
       {
@@ -34,7 +37,7 @@
         "apiVersion": "2020-08-01",
         "name": "[variables('workspaceName')]",
         "location": "[parameters('location')]",
-        "tags": "[parameters('resourceTags')]",
+        "tags": "[variables('tagsWorkspaces')]",
         "properties": {
           "sku": {
             "name": "PerGB2018"
@@ -50,7 +53,7 @@
         "apiVersion": "2015-11-01-preview",
         "name": "[variables('solutionName')]",
         "location": "[parameters('location')]",
-        "tags": "[parameters('resourceTags')]",
+        "tags": "[variables('tagsSolutions')]",
         "properties": {
           "workspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('workspaceName'))]"
         },
