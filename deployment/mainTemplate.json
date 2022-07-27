@@ -1,85 +1,68 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/0.1.2-preview/CreateUIDefinition.MultiVm.json#",
-    "handler": "Microsoft.Azure.CreateUIDef",
-    "version": "0.1.2-preview",
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
     "parameters": {
-        "basics": [
-            {
-                "name": "sentinelName",
-                "type": "Microsoft.Common.TextBox",
-                "label": "Sentinel Name",
-                "placeholder": "",
-                "defaultValue": "sentinel01",
-                "toolTip": "Use only allowed characters",
-                "constraints": {
-                    "required": true,
-                    "regex": "^[a-z0-9A-Z]{1,30}$",
-                    "validationMessage": "Only alphanumeric characters are allowed, and the value must be 1-30 characters long."
-                },
-                "visible": true
-            }
-		],
-        "steps": [
-			            {
-                "name": "sentinel",
-                "label": "Sentinel",
-                "elements": [
-					{
-						"name": "retentionInDays",
-						"type": "Microsoft.Common.TextBox",
-						"label": "Retention In Days",
-						"placeholder": "",
-						"defaultValue": "90",
-						"toolTip": "Use value between 30 and 730",
-						"constraints": {
-							"required": true,
-							"regex": "^[3-9][0-9]$|^[1-6][0-9][0-9]$|^[7][0-2][0-9]$|^730$",
-							"validationMessage": "Only numeric characters are allowed, and the value must be between 30 and 730."
-						},
-						"visible": true
-					},
-					{
-						"name": "dailyQuotaInGb",
-						"type": "Microsoft.Common.TextBox",
-						"label": "Daily Quota In Gb",
-						"placeholder": "",
-						"defaultValue": "1",
-						"toolTip": "Use value between 1 and 10",
-						"constraints": {
-							"required": true,
-							"regex": "^[1-9]$|^10$",
-							"validationMessage": "Only numeric characters are allowed, and the value must be between 1 and 10."
-						},
-						"visible": true
-					}
-
-                ]
-            },
-            {
-                "name": "tags",
-                "label": "Tags",
-                "elements": [
-                    {
-                        "name": "tagsByResource",
-                        "type": "Microsoft.Common.TagsByResource",
-                        "resources": [
-                            "Microsoft.OperationalInsights/workspaces",
-                            "Microsoft.OperationsManagement/solutions"
-                        ]
-                    }
-                ]
-            }
-        ],
-        "outputs": {
-            "sentinelName": "[basics('sentinelName')]",
-            "retentionInDays": "[steps('retentionInDays')]",
-            "dailyQuotaInGb": "[steps('dailyQuotaInGb')]",
-            "resourceTags": "[steps('tags').tagsByResource]"
+      "location": {
+        "type": "string",
+        "defaultValue": "[resourceGroup().location]"
+      },
+      "sentinelName": {
+        "type": "string",
+        "defaultValue": "sentinel"
+      },
+      "retentionInDays": {
+        "type": "int",
+        "defaultValue": 90,
+        "maxValue": 730,
+        "minValue": 30
+      },
+      "dailyQuotaInGb": {
+        "type": "int",
+        "defaultValue": 1
+      },
+      "resourceTags": {
+        "type": "object"
+      }
+    },
+    "variables": {
+      "workspaceName": "[parameters('sentinelName')]",
+      "solutionName": "[format('SecurityInsights({0})', variables('workspaceName'))]"
+    },
+    "resources": [
+      {
+        "type": "Microsoft.OperationalInsights/workspaces",
+        "apiVersion": "2020-08-01",
+        "name": "[variables('workspaceName')]",
+        "location": "[parameters('location')]",
+        "tags": "[parameters('resourceTags')]",
+        "properties": {
+          "sku": {
+            "name": "PerGB2018"
+          },
+          "retentionInDays": "[parameters('retentionInDays')]",
+          "workspaceCapping": {
+            "dailyQuotaGb":  "[parameters('dailyQuotaInGb')]"
+          }
+        }
+      },
+      {
+        "type": "Microsoft.OperationsManagement/solutions",
+        "apiVersion": "2015-11-01-preview",
+        "name": "[variables('solutionName')]",
+        "location": "[parameters('location')]",
+        "tags": "[parameters('resourceTags')]",
+        "properties": {
+          "workspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('workspaceName'))]"
         },
-		"resourceTypes": [
-            "microsoft.resources/resourcegroups",
-			"Microsoft.OperationalInsights/workspaces",
-			"Microsoft.OperationsManagement/solutions"
-		]
-    }
-}
+        "plan": {
+          "name": "[variables('solutionName')]",
+          "publisher": "Microsoft",
+          "product": "OMSGallery/SecurityInsights",
+          "promotionCode": ""
+        },
+        "dependsOn": [
+          "[resourceId('Microsoft.OperationalInsights/workspaces', variables('workspaceName'))]"
+        ]
+      }
+    ]
+  }
