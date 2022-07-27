@@ -20,13 +20,6 @@
         "type": "int",
         "defaultValue": 1
       },
-      "enableFusionAlert": {
-          "type": "bool",
-          "metadata": {
-              "description": "Enable Fusion analytics rules"
-          },
-          "defaultValue": true
-      },
       "resourceTags": {
         "type": "object"
       }
