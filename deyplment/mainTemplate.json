@@ -1,0 +1,68 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "location": {
+        "type": "string",
+        "defaultValue": "[resourceGroup().location]"
+      },
+      "sentinelName": {
+        "type": "string",
+        "defaultValue": "sentinel"
+      },
+      "retentionInDays": {
+        "type": "int",
+        "defaultValue": 90,
+        "maxValue": 730,
+        "minValue": 30
+      },
+      "dailyQuotaInGb": {
+        "type": "int",
+        "defaultValue": 1
+      },
+      "resourceTags": {
+        "type": "object"
+      }
+    },
+    "variables": {
+      "workspaceName": "[parameters('sentinelName')]",
+      "solutionName": "[format('SecurityInsights({0})', variables('workspaceName'))]"
+    },
+    "resources": [
+      {
+        "type": "Microsoft.OperationalInsights/workspaces",
+        "apiVersion": "2020-08-01",
+        "name": "[variables('workspaceName')]",
+        "location": "[parameters('location')]",
+        "tags": "[parameters('resourceTags')]",
+        "properties": {
+          "sku": {
+            "name": "PerGB2018"
+          },
+          "retentionInDays": "[parameters('retentionInDays')]",
+          "workspaceCapping": {
+            "dailyQuotaGb":  "[parameters('dailyQuotaInGb')]"
+          }
+        }
+      },
+      {
+        "type": "Microsoft.OperationsManagement/solutions",
+        "apiVersion": "2015-11-01-preview",
+        "name": "[variables('solutionName')]",
+        "location": "[parameters('location')]",
+        "tags": "[parameters('resourceTags')]",
+        "properties": {
+          "workspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('workspaceName'))]"
+        },
+        "plan": {
+          "name": "[variables('solutionName')]",
+          "publisher": "Microsoft",
+          "product": "OMSGallery/SecurityInsights",
+          "promotionCode": ""
+        },
+        "dependsOn": [
+          "[resourceId('Microsoft.OperationalInsights/workspaces', variables('workspaceName'))]"
+        ]
+      }
+    ]
+  }
