@@ -69,7 +69,15 @@
       }
     ],
     "outputs": {
-        "workspaceName": {
+        "subscriptionIdOutput": {
+            "type": "string",
+            "value": "[subscription().Id]"
+        },
+        "resourceGroupOutput": {
+            "type": "string",
+            "value": "[reference(resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName')), '2015-11-01-preview').resourceGroup]"
+        },
+        "workspaceNameOutput": {
             "type": "string",
             "value": "[parameters('workspaceName')]"
         },
@@ -80,6 +88,14 @@
         "workspaceKeyOutput": {
             "type": "string",
             "value": "[listKeys(resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName')), '2015-11-01-preview').primarySharedKey]"
+        },
+        "pricingTierOutput": {
+            "type": "string",
+            "value": "[reference(resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName')), '2015-11-01-preview').plan]"
+        },
+        "locationOutput": {
+            "type": "string",
+            "value": "[parameters('location')]"
         }
     }
   }
