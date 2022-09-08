@@ -32,8 +32,8 @@
                         "toolTip": "Use only allowed characters",
                         "constraints": {
                             "required": true,
-                            "regex": "^[a-z0-9A-Z]{1,30}$",
-                            "validationMessage": "Only alphanumeric characters are allowed, and the value must be 1-30 characters long."
+                            "regex": "^[a-z0-9A-Z\-]{1,30}$",
+                            "validationMessage": "Only alphanumeric characters and '-' are allowed, and the value must be 1-30 characters long. The '-' shouldn't be the first or the last symbol."
                         },
                         "visible": true
                     } ,                   
